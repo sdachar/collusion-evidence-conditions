@@ -1,0 +1,21 @@
+{
+ "pre": {
+  "price": 6.296,
+  "delta": -1.752,
+  "proposal_share": 0.991
+ },
+ "post": {
+  "price": 4.893,
+  "delta": -1.584,
+  "proposal_share": 0.847
+ },
+ "runs_reported": 17,
+ "runs_verified": 16,
+ "runs_audited": 18,
+ "n_runs": 40,
+ "arm": "R3-50",
+ "T": 16,
+ "info": false,
+ "seed": 20261027,
+ "parse_failures": 6
+}

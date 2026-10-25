@@ -12,3 +12,15 @@ REVIEW-fable-*.md
 report/REVIEW-fable-final.md
 report/CUT-PLAN-*.md
 report/REVIEW-fable-*.md
+!track3/PREREG-T3-leniency.md
+!track3/PREREG-T3-HASH.txt
+!track3/PREREG-Z2-HASH.txt
+!track3/RESULTS-T3-leniency.md
+!track3/PILOT0.md
+!track3/run_t3.py
+!track3/serve_qwen.py
+!track3/smoke_endpoint.py
+!track3/test_leniency.py
+!track3/test_analyze_t3.py
+!track3/z2_main_stdout.txt
+!track3/ladder/

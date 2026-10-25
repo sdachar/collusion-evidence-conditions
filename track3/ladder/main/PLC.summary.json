@@ -1,0 +1,21 @@
+{
+ "pre": {
+  "price": 2.032,
+  "delta": 0.789,
+  "proposal_share": 0.0
+ },
+ "post": {
+  "price": 1.901,
+  "delta": 0.941,
+  "proposal_share": 0.0
+ },
+ "runs_reported": 0,
+ "runs_verified": 0,
+ "runs_audited": 0,
+ "n_runs": 40,
+ "arm": "PLC",
+ "T": 16,
+ "info": false,
+ "seed": 20261026,
+ "parse_failures": 0
+}
