@@ -67,7 +67,7 @@ git push -u origin main
 7. File → Download → PDF.
 
 ## Step 4 (10 min): the form
-- **Project title:** `What Should Count as Evidence of AI Collusion? Four Conditions, Three Published Instruments, and a Randomised Test`
+- **Project title:** `Is It Really Collusion? Four Conditions for AI Collusion Evidence, and Three Published Instruments That Don't Meet Them`
 - **Project summary:** paste the abstract.
 - **PDF:** from Step 3.
 - **Track:** **Track 2 (Detection & Audit)**, question 2.3. Pick by name, not number.

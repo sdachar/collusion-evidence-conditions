@@ -11,7 +11,7 @@
 > 5. ~~GitHub URL~~ **Decided:** https://github.com/sdachar/collusion-evidence-conditions. The repo is
 >    still to be created (SUBMIT-CHECKLIST Step 2).
 
-# What Should Count as Evidence of AI Collusion? Four Conditions, Three Published Instruments, and a Randomised Test
+# Is It Really Collusion? Four Conditions for AI Collusion Evidence, and Three Published Instruments That Don't Meet Them
 
 **Author:** Shubha Dhananjaya Achar **Affiliation:** Independent
 **Track 2.3: What should count as convincing evidence of collusion?** · AI Collusion Research Sprint (Apart Research), 23–25 Oct 2026
