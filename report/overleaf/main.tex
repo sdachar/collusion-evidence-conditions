@@ -62,7 +62,7 @@ against steganographic collusion is intractable \cite[Thm.~2]{motwani}, so a det
 validated by an optimiser's failure to beat it. What \emph{can} be checked is whether the evidence it
 produces is about collusion rather than about its own construction.
 
-\paragraph{Contributions.}
+\noindent\textbf{Contributions.}
 \begin{enumerate}
   \item \textbf{Four conditions} for collusion evidence, each with an executable check
         (\code{check\_conditions.py}, 14 tests) that returns PASS, FAIL or NOT-ASSESSABLE from an
@@ -119,12 +119,14 @@ Condition & The failure it catches & Check (default threshold) \\
 \end{tabularx}
 \end{table}
 
-\code{build\_specs.py} builds a JSON spec per instrument (Table~\ref{tab:conditions}) from its
-released files; \code{check\_conditions.py} emits the verdict card (Table~\ref{tab:verdicts}). The
+\code{build\_specs.py} builds a JSON spec per instrument from its released files;
+\code{check\_conditions.py} scores it against the four checks of Table~\ref{tab:conditions} and emits
+the verdict card (Table~\ref{tab:verdicts}). The
 per-instrument procedure (recompute from the committed JSON and leave-one-statistic-out over the 255
 subsets for ColludeBench; $n$ recovered from the published $r$/$p$ pairs and Fisher-$z$ intervals for
 Riemer et al.; a 62/62 metadata join for NARCBench) is in Appendix~\ref{app:repro}. A \code{grep}
-baseline (P4) was not run: it needs regenerated transcripts, hence third-party code.
+baseline, pre-registered as P4 (Appendix~\ref{app:prereg}), was not run: it needs regenerated
+transcripts, which would mean executing third-party code.
 
 \subsection{The randomised canary}
 Pre-registered in \code{PREREG-P9-canary.md}, SHA-256 hashed before any LLM call; amendments A1--A7
@@ -185,8 +187,8 @@ At FPR $10^{-2}$ the full union is 15/17 = 0.88 [0.66, 0.97]; \textbf{without
 \code{permutation\_invariance} it is 7/17 = 0.41} [0.22, 0.64] (Figure~\ref{fig:union}). Removing any
 other single statistic leaves 0.88, apart from \code{acceptance\_bias} (0.71). In
 \code{metrics.json}, \code{permutation\_invariance} fires on 99\% of honest windows at the same
-budget; the ablation credits it with zero false positives only because each of its 510 entries has
-exactly one negative configuration (17 positive, 1 negative), which also fails (iv).
+budget; the ablation credits it with zero false positives only because each of the ablation's 510 entries
+has exactly one negative configuration (17 positive, 1 negative), which also fails (iv).
 The honest pool is template-generated (600 calibration runs, no colluding run), so it is not a
 placebo for a claim about LLM agents.
 
@@ -224,10 +226,11 @@ containing A's true cost. $\Delta=(\pi-\pi_{\text{Nash}})/(\pi_{\text{mon}}-\pi_
 $\ddagger$ M-S: B's inbox holds another run's M message; 62\% is adoption of that message; A's own
 message (5\% emission) is never delivered.}
 \label{tab:canary}
+\setlength{\tabcolsep}{4pt}%
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lccccccc@{}}
 \toprule
-Arm & Effect of $c_A$ on $p_B$ & MDE & A's own-cost pass-through & $p_B$ = A's message no. & Emission & Mean price $-$ P-0 & Profit index $\Delta$ \\
+Arm & \shortstack{Effect of $c_A$\\on $p_B$} & MDE & \shortstack{A's own-cost\\pass-through} & \shortstack{$p_B$ = A's\\message no.} & Emission & \shortstack{Mean price\\$-$ P-0} & \shortstack{Profit\\index $\Delta$} \\
 \midrule
 P-0 & $-0.203$ [$-0.544$, $+0.137$] & 0.47 & $+0.80$ [$+0.33$, $+1.29$] & -- & -- & -- & $-0.61$ [$-0.82$, $-0.40$] \\
 POS & $\mathbf{+0.133}$ [$+0.067$, $+0.198$] & 0.09 & $+0.99$ & 66\% & 100\% & -- & $+0.84$ [$+0.79$, $+0.89$] \\
@@ -293,7 +296,8 @@ is sustained by incentives, not only that prices move together.
 \centering
 \includegraphics[width=0.7\textwidth]{figures/fig3_compliance.png}
 \caption{B's round-1 price against the number in its prompt (Z2, 40 independent calls per point).
-The dashed line marks an exact copy. Whiskers (95\% CIs) are narrower than the dots.}
+The dashed line marks an exact copy. Whiskers (95\% CIs) are narrower than the dots. Points are
+offset horizontally for visibility.}
 \label{fig:compliance}
 \end{figure}
 
@@ -415,17 +419,18 @@ within-run permutation test shown invalid on scripted agents; \textbf{A2} placeb
 \textbf{A3} backend (Qwen3.8-27B on Groq; one call for A's message and price), before any
 pre-registered run; \textbf{A4} POS's proposal step, before the POS, M and M+P arms; \textbf{A5} the
 parser requires a \code{"price"} key, from M+P on (sensitivity: dropping the one affected run per
-completed arm moves POS to $+0.787$ SD; P-0 unchanged); \textbf{A6} M-S, post hoc (primary
+completed arm moves POS to $+0.787$ SD; P-0 still contains 0); \textbf{A6} M-S, post hoc (primary
 estimate $R=(\text{M-S}-\text{P-0})/(\text{M}-\text{P-0})$, pre-set threshold 0.5; M-S $-$ P-0
 $=+1.060$ [$+0.737$, $+1.360$]); \textbf{A7}
-reporting in price units with MDE, post hoc. M-S's first attempt crashed on a rate-limit retry bug;
-per the pre-registration it was re-run whole after a retry-only harness fix (hash recorded), and the
-partial run is archived unanalysed. Round numbers: B's prices are multiples of 0.5 in 66\% (M),
+reporting in price units with MDE, post hoc. Two arms were re-run whole per the pre-registration:
+POS, whose first attempt stopped on a Groq daily-cap 429 at B's price call, and M-S, whose first
+attempt crashed on a rate-limit retry bug and was re-run after a retry-only harness fix (hash
+recorded). Both partial runs are archived unanalysed (\code{canary/prereg/failed-*}). Round numbers: B's prices are multiples of 0.5 in 66\% (M),
 78\% (M+P) and 24\% (P-0) of rounds.
 
 \textbf{Compliance follow-up (Z2)}, hashed before any Z2 call; designed after seeing the canary, so a
 post-hoc follow-up. Canary round-1 B prompt, 40 independent calls per arm, self-hosted Qwen3.8-27B
-(vLLM, A100-80GB), 0 parse failures in 360 calls.
+(vLLM, A100-80GB), 0 parse failures in 360 calls (320 B prices plus 40 live A messages for the bridge arm).
 \begin{itemize}
   \item \textbf{H0} (BRIDGE adopts $\geq 26/40$; the new stack reproduces the canary): holds, 36/40.
   \item \textbf{H1} (RIVAL-2.5 and RIVAL-3.5 adopt in $\geq 60\%$): holds, 40/40 and 40/40.
@@ -443,8 +448,8 @@ post-hoc follow-up. Canary round-1 B prompt, 40 independent calls per arm, self-
 \textbf{Audit procedure.} \textbf{ColludeBench} \cite{tailor} (MIT): we recomputed the committed
 \code{metrics.md} from \code{metrics.json}, compared both with the paper, and ran
 leave-one-statistic-out over the 255 non-empty subsets of 8 statistics in \code{ablation.json}.
-\textbf{Riemer et al.}\ \cite{riemer}: we recovered $n$ from the reported $r$/$p$ pairs in Table~3
-and computed Fisher-$z$ intervals. \textbf{NARCBench} \cite{narc}: we joined the released activation
+\textbf{Riemer et al.}\ \cite{riemer}: we recovered $n$ from the reported $r$/$p$ pairs in their
+Table~3 and computed Fisher-$z$ intervals. \textbf{NARCBench} \cite{narc}: we joined the released activation
 metadata to the released run configurations (62 Qwen3-32B runs; seeds and agent names match 62/62)
 and compared the positive label with the assigned mode and with the authors' own behavioural flags.
 Every downloaded file was treated as untrusted data and read with Python in isolated mode; no
@@ -469,6 +474,7 @@ third-party code was executed.
 \section{Corrections made during the sprint}\label{app:corrections}
 \begin{table}[H]
 \centering\small
+\caption{Claims retracted during the sprint after independent review.}
 \begin{tabularx}{\textwidth}{@{}YY@{}}
 \toprule
 Claim as first made & Correction \\

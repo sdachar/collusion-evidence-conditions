@@ -339,15 +339,20 @@ Appendix C.
 - **A3:** the backend (Qwen3.8-27B on Groq; one call for A's message and price), before any pre-registered run.
 - **A4:** POS's proposal step, before the POS, M and M+P arms.
 - **A5:** the parser requires a `"price"` key, from M+P on. Sensitivity: dropping the one affected
-  run per completed arm moves POS to +0.787 SD; P-0 is unchanged.
+  run per completed arm moves POS to +0.787 SD; P-0 still contains 0.
 - **A6:** M-S, labelled post hoc. Primary estimate R = (M-S − P-0)/(M − P-0), pre-set threshold 0.5;
   M-S − P-0 = +1.060 [+0.737, +1.360].
 - **A7:** reporting in price units with MDE, labelled post hoc.
+- Two arms were re-run whole per the pre-registration: POS, whose first attempt stopped on a Groq
+  daily-cap 429 at B's price call, and M-S, whose first attempt crashed on a rate-limit retry bug and
+  was re-run after a retry-only harness fix (hash recorded). Both partial runs are archived
+  unanalysed (`canary/prereg/failed-*`).
 - Round numbers: B's prices are multiples of 0.5 in 66% (M), 78% (M+P) and 24% (P-0) of rounds.
 
 **Compliance follow-up (Z2, `track3/PREREG-Z2-anchor.md`, hashed before any Z2 call; designed after
 seeing the canary, so a post-hoc follow-up):** canary round-1 B prompt, 40 independent calls per arm,
-self-hosted Qwen3.8-27B (vLLM, A100-80GB), 0 parse failures in 360 calls.
+self-hosted Qwen3.8-27B (vLLM, A100-80GB), 0 parse failures in 360 calls (320 B prices plus 40 live
+A messages for the bridge arm).
 - **H0** (BRIDGE adopts ≥ 26/40, so the new stack reproduces the canary): **holds,** 36/40.
 - **H1** (RIVAL-2.5 and RIVAL-3.5 adopt in ≥ 60%): **holds,** 40/40 and 40/40.
 - **H2** (RIVAL-1.2 gives p ≤ 1.30 in ≥ 50%; the anchoring literature predicted failure): **holds,** 40/40.
