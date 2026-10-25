@@ -255,7 +255,13 @@ conditions make that checkable from released files:
 
 **Future work.** Antitrust price screens (coefficient of variation, relative distance) ported to LLM
 pricing logs, and leniency for AI cartels: B adopts A's explicit price proposals in 83–98% of rounds,
-a reportable agreement. Both held to the same four conditions.
+a reportable agreement. Both held to the same four conditions. A separately pre-registered leniency
+pilot (not evidence for this paper; 40 runs per arm, scripted cartel partner) already shows the
+emission–action gap: offered a bare report field with no authority or reward, B reports its partner
+at the first chance in 37/40 runs; reporting rises only weakly with the reward (pre-registered
+contrast +0.10 [0.00, 0.225], below its threshold); no regime moves B's price, 49 of 54 reporters in
+the leniency arms keep the cartel price the next round, and a matched-chatter placebo draws no false reports (0/40).
+Confession without desistance.
 
 ## 7. Code and data
 
