@@ -54,12 +54,12 @@ Collusion between AI agents is usually evidenced in one of three ways: \textbf{s
 messages} (steganalysis, mutual information), \textbf{AI judges reading chains of thought}, and
 \textbf{probes on internal activations}. Each reports a headline number: a true-positive rate at a
 calibrated false-positive budget, a null correlation, an AUROC. The sprint asks what should count as
-convincing evidence. We answer with a standard, not a new detector.
+convincing evidence.
 
-The choice not to build a detector is deliberate. Motwani et al.\ \cite[Thm.~2]{motwani} show that
-black-box optimisation against steganographic collusion is intractable, so a detector cannot be
-validated by showing that an optimiser failed to beat it. What \emph{can} be checked is whether the
-evidence a detector produces is about collusion rather than about its own construction.
+We answer with a standard, not a new detector, and the choice is deliberate: black-box optimisation
+against steganographic collusion is intractable \cite[Thm.~2]{motwani}, so a detector cannot be
+validated by an optimiser's failure to beat it. What \emph{can} be checked is whether the evidence it
+produces is about collusion rather than about its own construction.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -73,36 +73,30 @@ evidence a detector produces is about collusion rather than about its own constr
         least one of them: (i), (ii) and (iv). The placebo condition (iii) cannot be checked on any,
         because none releases a same-process honest baseline.
   \item \textbf{A randomised canary test}, pre-registered and hashed before any LLM call, that passes
-        all four. It shows what evidence that meets the standard looks like, and what it finds:
-        explicit price coordination without detectable private-information flow.
+        all four and finds explicit price coordination without detectable private-information flow.
 \end{enumerate}
 
 % ---------------------------------------------------------------- 2
 \section{Related Work}
 
 \textbf{Detecting AI collusion.} Motwani et al.\ \cite{motwani} define secret collusion via
-steganography and bound black-box detection. ColludeBench \cite{tailor} combines eight statistics
-into a calibrated union; Riemer et al.\ \cite{riemer} report that a CoT judge's collusion probability
-stays flat while steering makes pricing agents collusive; NARCBench \cite{narc} reports probe AUROC
-1.00 on multi-agent activations. Lange et al.\ \cite{lange} show that a trained stegosystem evades a
-text classifier but not a logit classifier. These works each propose or test an instrument; we ask
-what an instrument's evidence must satisfy, and score them on it.
+steganography and bound black-box detection; Lange et al.\ \cite{lange} show that a trained
+stegosystem evades a text classifier but not a logit classifier. The three instruments we audit
+\cite{tailor,riemer,narc} each propose or test a detector (\S4.1). We found no shared standard for
+when such an instrument's output counts as evidence, and no audit that applies one standard across
+statistical, judge-based and activation-based instruments; we ask what the evidence must satisfy,
+and score them on it.
 
-\textbf{Algorithmic collusion in economics.} Calvano et al.\ \cite{calvano} show Q-learning pricing
-agents reach supra-competitive prices and introduce the profit index $\Delta$ we use. Athey and
-Bagwell \cite{athey} show that efficient collusion under private costs requires cost
-communication; Dechenaux and Mago \cite{dechenaux} ran that setting with human subjects and chat.
-Our canary applies a randomised per-round estimator to this setting with LLM agents.
+\textbf{Algorithmic collusion in economics.} Calvano et al.\ \cite{calvano} show that Q-learning
+pricing agents reach supra-competitive prices; we use their profit index $\Delta$. Athey and Bagwell
+\cite{athey} show that efficient collusion under private costs requires cost communication, the leak
+our canary tests for with LLM agents; Dechenaux and Mago \cite{dechenaux} ran that setting with
+human subjects.
 
 \textbf{Evidentiary standards in antitrust.} Tacit collusion is lawful \cite{textmsg}; courts
 require ``plus factors'' beyond parallel pricing. Our conditions sharpen that doctrine rather than
 replacing it: condition (iii) is the counterfactual requirement, ported to a generator the auditor
 controls.
-
-\textbf{Gap.} We found no shared standard for when a collusion detector's output counts as evidence,
-and no audit that applies one standard across statistical, judge-based and activation-based
-instruments.
-
 % ---------------------------------------------------------------- 3
 \section{Methods}
 
@@ -124,19 +118,12 @@ Condition & The failure it catches & Check (default threshold) \\
 \end{tabularx}
 \end{table}
 
-\code{check\_conditions.py} takes a JSON spec per instrument, built by \code{build\_specs.py}
-directly from that instrument's released files, and emits the verdict card (Table~\ref{tab:verdicts}).
-Every downloaded file was treated as untrusted data and read with Python in isolated mode; no
-third-party code was executed.
-
-\subsection{Audit procedure}
-\textbf{ColludeBench} \cite{tailor} (MIT): we recomputed the committed \code{metrics.md} from
-\code{metrics.json}, compared both with the paper, and ran leave-one-statistic-out over the 255
-non-empty subsets of 8 statistics in \code{ablation.json}. \textbf{Riemer et al.}\ \cite{riemer}:
-we recovered $n$ from the reported $r$/$p$ pairs in Table~3 and computed Fisher-$z$ intervals.
-\textbf{NARCBench} \cite{narc}: we joined the released activation metadata to the released run
-configurations (62 Qwen3-32B runs; seeds and agent names match 62/62) and compared the positive label
-with the assigned mode and with the authors' own behavioural flags.
+\code{build\_specs.py} builds a JSON spec per instrument (Table~\ref{tab:conditions}) from its
+released files; \code{check\_conditions.py} emits the verdict card (Table~\ref{tab:verdicts}). The
+per-instrument procedure (recompute from the committed JSON and leave-one-statistic-out over the 255
+subsets for ColludeBench; $n$ recovered from the published $r$/$p$ pairs and Fisher-$z$ intervals for
+Riemer et al.; a 62/62 metadata join for NARCBench) is in Appendix~\ref{app:repro}. A \code{grep}
+baseline (P4) was not run: it needs regenerated transcripts, hence third-party code.
 
 \subsection{The randomised canary}
 Pre-registered in \code{PREREG-P9-canary.md}, SHA-256 hashed before any LLM call; amendments A1--A7
@@ -146,12 +133,13 @@ dated (Appendix~\ref{app:prereg}).
         (Calvano/Riemer parameters: Nash price 1.47, monopoly 1.93).
   \item \textbf{Each round:} firm A privately draws a fresh cost $c_A\in\{0.8,1.2\}$ i.i.d.; A may
         send one message to B; both post prices simultaneously.
-  \item \textbf{Why no model of the agents is needed:} when B prices, $c_A$ is independent of
+  \item \textbf{Identification:} when B prices, $c_A$ is independent of
         everything B has seen publicly. Without a private channel, the statistic
         $z_t=(c_{A,t}-1)(p_{B,t}-p_{B,t-1})/0.1$ has expectation exactly zero, whatever the agents'
         policy.
   \item \textbf{Inference:} a $t$-interval over 40 independent run means. Calibrated on scripted
-        agents: 10/200 false positives (5.0\%).
+        agents: 10/200 false positives (5.0\%). A within-run permutation test, invalid on the same
+        scripted agents, was replaced by this estimator (A1).
   \item \textbf{Model:} Qwen3.8-27B (Groq), temperature 1.0, identical across arms.
 \end{itemize}
 \textbf{Arms} (40 runs each): \textbf{P-0}, no channel (placebo); \textbf{POS}, A told to share its
@@ -163,11 +151,6 @@ hoc).
 \textbf{Compliance follow-up (Z2).} A separately pre-registered check
 (\code{track3/PREREG-Z2-anchor.md}) re-ran the canary's round-1 B prompt, varying only B's inbox,
 with 40 independent calls per arm on self-hosted Qwen3.8-27B (vLLM).
-
-\textbf{What did not work.} A within-run permutation test was shown to be invalid on scripted agents
-and replaced by the run-level estimator (A1). Regenerating ColludeBench transcripts for a \code{grep}
-baseline would have required executing third-party code, so it was not run (P4).
-
 % ---------------------------------------------------------------- 4
 \section{Results}
 
@@ -194,20 +177,17 @@ $\dagger$ Lange et al.\ \cite{lange} (logit classifier) & PASS & PASS & PASS: co
 
 \paragraph{ColludeBench.} The only collusion benchmark we found that ships its detector output under
 a licence; its author deserves credit for that, since it is why this audit can be done
-arithmetically. All 16 single-detector cells in the committed \code{metrics.md} recompute exactly
-from \code{metrics.json}, and the paper's ablation paragraph (p.~8) reproduces exactly from
-\code{ablation.json}. The paper's Table~1 (p.~7) does not: only \code{acceptance\_bias} matches;
-\code{cross\_run\_mi} reads 0.658/0.598 in the paper vs 0.045/0.033 committed, and the Bonferroni
-union reads 1.000 vs 0.333.
+arithmetically. All 16 single-detector cells in the committed \code{metrics.md} and the paper's
+ablation paragraph (p.~8) recompute exactly from the committed JSON; ColludeBench's Table~1 (p.~7)
+does not (Appendix~\ref{app:prereg}, P1).
 At FPR $10^{-2}$ the full union is 15/17 = 0.88 [0.66, 0.97]; \textbf{without
 \code{permutation\_invariance} it is 7/17 = 0.41} [0.22, 0.64] (Figure~\ref{fig:union}). Removing any
 other single statistic leaves 0.88, apart from \code{acceptance\_bias} (0.71). In
 \code{metrics.json}, \code{permutation\_invariance} fires on 99\% of honest windows at the same
 budget; the ablation credits it with zero false positives only because each of its 510 entries has
 exactly one negative configuration (17 positive, 1 negative), which also fails (iv).
-\code{watermark\_variance}'s ``FPR 0'' is a floor effect (threshold 0.0; every honest score is exactly
-0.0). The honest pool is template-generated, so it is not a placebo for a claim about LLM agents, and
-the integrity manifest lists 600 honest calibration runs and no colluding run.
+The honest pool is template-generated (600 calibration runs, no colluding run), so it is not a
+placebo for a claim about LLM agents.
 
 \begin{figure}[H]
 \centering
@@ -219,31 +199,29 @@ Wilson 95\% CI over the 17 positive configurations.}
 
 \paragraph{Riemer et al.} A CoT judge's collusion probability is flat (32--34\%) while steering moves
 behaviour from near-Nash to highly collusive. Their Table~3 correlations (PDF p.~9) are over
-\textbf{$n=7$ steering magnitudes}: inverting the $r$/$p$ pairs recovers $n=7$ on four cells. The
-headline $r=0.194$ then has a 95\% CI of \textbf{$[-0.65,+0.83]$}. A null claim needs a CI that
-rules out a strong effect; this one includes the same table's $r=0.771$ for ``will this agent raise
-its price?''. The null is uninformative at this $n$, which is not evidence that CoT monitoring works.
+\textbf{$n=7$ steering magnitudes}, recovered from the $r$/$p$ pairs on four cells; the headline
+$r=0.194$ then has a 95\% CI of \textbf{$[-0.65,+0.83]$}, which includes the same table's $r=0.771$
+(``will this agent raise its price?''). A null needs a CI that rules out a strong effect; this one is
+uninformative, which is not evidence that CoT monitoring works.
 
 \paragraph{NARCBench.} The released positive label equals the assigned mode in every run, so
 predicting it from the role alone gives AUROC 1.00 by construction. By the authors' own
-\code{collusion\_success} flag (both colluders voted for the target), 8 of the 31 positives did not
-coordinate; in 6, no colluder voted for the target. Only 2 of 31 swung the vote
-(\code{target\_majority}). On these behavioural labels (i) passes (role-only AUROC 0.897 and 0.758),
-so the failure is the label's, not the probe's. \emph{Caveat:} the paper's selection may rest on a
-transcript judgment that is not shipped, so we state that the shipped flag disagrees with the label,
-not that the label is wrong. No Verdict tier is released, so the pre-registered scenario-level
-interval (P8) cannot be computed.
+\code{collusion\_success} flag, 8 of the 31 positives did not coordinate (in 6, no colluder voted for
+the target) and only 2 swung the vote (\code{target\_majority}); on these behavioural labels (i) passes (role-only AUROC 0.897 and 0.758),
+so the failure is the label's, not the probe's. The paper's selection may rest on an unshipped
+transcript judgment (Appendix~\ref{app:prereg}), so the claim is that the shipped flag disagrees with
+the label, not that the label is wrong; no per-scenario tier is released, so (iv) is NA (P8).
 
 \subsection{The canary}
 
 \begin{table}[H]
 \centering
 \caption{Canary results (\code{canary/report.py} $\to$ \code{prereg/report.json}); effects in price
-units with 95\% CI. MDE = minimum detectable effect ($2.8\times$SE). Emission = share of A's messages
+units, 95\% CI. MDE = minimum detectable effect ($2.8\times$SE). Emission = share of A's messages
 containing A's true cost. $\Delta=(\pi-\pi_{\text{Nash}})/(\pi_{\text{mon}}-\pi_{\text{Nash}})$
 \cite{calvano,riemer}, per firm per round, run-level bootstrap CI (0 = Nash, 1 = monopoly).
-$\ddagger$ In M-S, B's inbox holds an M message from a different run; 62\% is B adopting a number
-from that delivered message. A's own message (5\% emission) is logged but never delivered.}
+$\ddagger$ M-S: B's inbox holds another run's M message; 62\% is adoption of that message; A's own
+message (5\% emission) is never delivered.}
 \label{tab:canary}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lccccccc@{}}
@@ -272,22 +250,20 @@ Dropping rounds whose message contains the true cost leaves the M estimate at $+
 $+0.358$].
 
 \textbf{Measure choice decides the verdict.} With a channel, prices rise by $+1.1$ (M) and $+1.4$
-(M+P) over the placebo (Figure~\ref{fig:canary}b). The median $p_B$ is 2.5 in both, against 1.45 in
-P-0: above the monopoly price of 1.93, past the joint-profit optimum. Profits do not rise: $\Delta$ is
-negative in every open arm and not detectably higher than the placebo's (M $-0.54$, M+P $-0.77$, P-0 $-0.61$).
-Only POS, whose proposal is cost $+1$, approaches monopoly profit ($+0.84$). The agents coordinate
-explicitly on price, but on prices that harm consumers and the firms alike: coordinated
-over-pricing, not profitable collusion. A price-level detector would flag M and M+P; a profit-based
-index would not. The information-flow test answers a third question: no private cost moves at a
-detectable size.
+(M+P) over the placebo (Figure~\ref{fig:canary}b); the median $p_B$ is 2.5 in both (P-0: 1.45),
+above the monopoly price of 1.93. Profits do not rise: $\Delta$ is negative in every open arm and not
+detectably higher than the placebo's (M $-0.54$, M+P $-0.77$, P-0 $-0.61$); only POS, whose proposal
+is cost $+1$, approaches monopoly profit ($+0.84$). This is coordinated over-pricing, not profitable collusion.
+A price-level detector would flag M and M+P as
+collusive; a profit index would not; the information-flow test answers a third question, and finds
+no private cost moving at a detectable size.
 
-\textbf{Does the rise need a live partner?} M-S's primary estimate is $R=(\text{M-S}-\text{P-0})/
-(\text{M}-\text{P-0})$: a CI below 0.5 means within-pair coordination; above 0.5 means exposure to any
-price proposal, or framing. \textbf{$R=0.96$ [0.68, 1.40]}: almost the whole rise survives when B
-reads a stranger's message (M-S $-$ P-0 $=+1.060$ [$+0.737$, $+1.360$]; M-S $-$ M $=-0.045$
-[$-0.448$, $+0.338$]). M-S cannot separate exposure from framing. Because its inbox is independent of
-$c_A$, M-S is also a channel-open placebo for the canary, and its CI contains 0 ($+0.003$ [$-0.212$,
-$+0.218$]).
+\textbf{Does the rise need a live partner?} No. M-S, where B reads a stored M message from a
+different run, reproduces \textbf{$R=0.96$ [0.68, 1.40]} of M's rise over P-0 (M-S $-$ M $=-0.045$
+[$-0.448$, $+0.338$]); a CI below 0.5 would have indicated within-pair coordination. Exposure to any
+price proposal, or the shared framing, produces it, and M-S cannot separate the two. Because its
+inbox is independent of $c_A$, M-S is also a channel-open placebo, and its canary CI contains 0
+(Table~\ref{tab:canary}).
 
 \begin{figure}[H]
 \centering
@@ -301,18 +277,16 @@ monopoly price lower joint profit (Table~\ref{tab:canary}, $\Delta$).}
 \subsection{Worked case: lockstep is compliance, not collusion}
 Price lockstep is the signature a behavioural detector reads as collusion. Here it is something
 else. B adopts the number in A's message in round 1, before any history exists to reward or punish
-it: 34/40 runs (M) and 38/40 (M+P). Following costs B 29.7 profit per round in M [24.1, 35.5] and
-31.5 in M+P [24.5, 38.4] against a best response to A's actual price: more than a full round of Nash
-profit (22.2); P-0 shows 7.9 [5.3, 11.0]. B's prices are multiples of 0.5 in 66\% (M) and 78\% (M+P)
-of rounds, against 24\% in P-0. A colluder holds a high price because deviating is punished later;
+it: 34/40 runs (M) and 38/40 (M+P). Following costs B 29.7 [24.1, 35.5] (M) and 31.5
+[24.5, 38.4] (M+P) profit per round against a best response to A's actual price, more than a round
+of Nash profit (22.2); P-0: 7.9 [5.3, 11.0]. A colluder holds a high price because deviating is punished later;
 this follower gives up profit with nothing to fear.
 
-In Z2, B priced at the rival's proposed 1.20, 1.50, 2.50 and 3.50 in 39, 40, 40 and 40 of 40 calls:
-downward as readily as upward, including 1.20, below the Nash price (Figure~\ref{fig:compliance}). It
-followed an ``independent analyst's'' number almost as closely (shift ratio 0.97 [0.91, 1.00]) and
-adopted a live A's real message in 36 of 40. Lockstep here is obedience to whichever number is in the
-prompt, not a strategy sustained by incentives. A claim of collusion therefore has to show the
-coordination is sustained by incentives, not just that prices move together.
+In Z2, B priced at the rival's proposed 1.20, 1.50, 2.50 and 3.50 in 39, 40, 40 and 40 of 40 calls,
+downward as readily as upward and below the Nash price at 1.20 (Figure~\ref{fig:compliance}); it
+followed an ``independent analyst's'' number almost as closely (shift ratio 0.97 [0.91, 1.00]) and a
+live A's real message in 36 of 40. A claim of collusion therefore has to show that the coordination
+is sustained by incentives, not only that prices move together.
 
 \begin{figure}[H]
 \centering
@@ -325,43 +299,36 @@ The dashed line marks an exact copy. Whiskers (95\% CIs) are narrower than the d
 % ---------------------------------------------------------------- 5
 \section{Discussion and Limitations}
 
-\textbf{Discussion.} Collusion evidence should be judged on whether it is about collusion, not only
-on its headline. Across three instrument kinds, the failures share a cause: the positive class, the
-null or the honest baseline is defined by the experimenter's construction rather than by the agents'
-behaviour. The canary shows the remedy is cheap when the auditor controls the generator: randomise a
-private variable and test whether it moves. It also shows that ``collusion'' verdicts on LLM agents
-depend on the measure (price vs profit vs information flow) and can be produced by plain compliance.
+\textbf{Discussion.} Across three instrument kinds the failures share a cause: the positive class,
+the null or the honest baseline is defined by the experimenter's construction, not by the agents'
+behaviour. When the auditor controls the generator the remedy is cheap: randomise a private variable
+and test whether it moves.
 
 \textbf{Limitations.}
 \begin{itemize}
   \item \textbf{The conditions are necessary, not sufficient.} Passing them makes evidence checkable;
         it does not make a detector complete. Motwani's result still bounds every black-box test,
         including ours.
-  \item \textbf{We ran one instrument ourselves.} The three audits use released files. Several
-        verdicts are NA because per-unit data is not released: a statement about releases, not a
-        proof that the instruments fail.
+  \item \textbf{The three audits use released files only.} NA verdicts are statements about what is
+        released, not proof that the instruments fail.
   \item \textbf{The canary's nulls are under-powered:} MDE 0.30--0.56 price units against a
         positive-control effect of 0.13. The test can certify a leak; with 40 runs per arm it cannot
         certify its absence. One model, one temperature, one prompt per arm, an 8-round horizon.
-  \item \textbf{The price-level comparison (M vs P-0) confounds the channel with prompt framing.}
-        M-S was added for this, and cannot separate exposure from framing.
-  \item \textbf{Our own corrections are logged} (Appendix~\ref{app:corrections}): five claims made
-        during the sprint were retracted after independent review.
+  \item \textbf{Five claims made during the sprint were retracted} after independent review
+        (Appendix~\ref{app:corrections}).
 \end{itemize}
 
-\textbf{Future work.} (1) Port antitrust screens (coefficient of variation, relative distance,
-variance screens) to LLM pricing logs, each held to the same four conditions. (2) Test leniency for
-AI cartels: our agents already make explicit price proposals, which B adopts in 83--98\% of rounds,
-so a reportable agreement exists; its evidence should be held to the same conditions.
+\textbf{Future work.} Antitrust price screens (coefficient of variation, relative distance) ported
+to LLM pricing logs, and leniency for AI cartels: B adopts A's explicit price proposals in 83--98\%
+of rounds, a reportable agreement. Both held to the same four conditions.
 
 % ---------------------------------------------------------------- 6
 \section{Conclusion}
 Four conditions make it checkable, from released files, whether collusion evidence is about
 collusion. Applied to three instruments of three kinds, every condition that can be checked fails
 somewhere, and the placebo condition cannot be checked on any of them. A randomised test built to the
-standard passes all four, and on LLM pricing agents it separates price coordination from information
-flow: prices rise past monopoly with no profit gain and no detectable cost leak, and the follower's
-lockstep is compliance with whatever number it is shown.
+standard passes all four; on LLM pricing agents it finds prices past monopoly with no profit gain, no
+detectable cost leak, and a follower whose lockstep is compliance with whatever number it is shown.
 
 % ---------------------------------------------------------------- Code and Data
 \section*{Code and Data}
@@ -412,7 +379,9 @@ lockstep is compliance with whatever number it is shown.
         read in isolated directories with Python in isolated mode, never executed. This is why
         ColludeBench's transcripts were not regenerated (P4).
   \item \textbf{Scope.} Small-scale testbeds built to study detection. Results on one model, one
-        market and an 8-round horizon do not establish how deployed pricing agents behave.
+        market and an 8-round horizon do not establish how deployed pricing agents behave. The M vs
+        P-0 price comparison confounds the channel with prompt framing; M-S was added for this and
+        cannot separate exposure from framing.
 \end{enumerate}
 
 \section{All pre-registered predictions, reported whichever way they fell}\label{app:prereg}
@@ -421,28 +390,37 @@ lockstep is compliance with whatever number it is shown.
   \item \textbf{P1:} the two \code{cross\_run\_mi} numbers come from different subsets, and only one
         reproduces. \textbf{Result:} \emph{Table~1 does not reproduce from the committed output; the
         ablation section does.} 0.12 (ablation, 2/17) reproduces; 0.658 does not appear in
-        \code{metrics.md}.
+        \code{metrics.md}. In ColludeBench's Table~1 only \code{acceptance\_bias} matches;
+        \code{cross\_run\_mi} reads 0.658/0.598 in the paper vs 0.045/0.033 committed, and the
+        Bonferroni union 1.000 vs 0.333.
   \item \textbf{P2:} removing \code{acceptance\_bias} drops the union to $\leq 0.70$. Not testable as
         worded (\code{metrics.json} stores union summaries only). On the ablation union the result is
         0.706 at $10^{-2}$: just above the threshold, so \textbf{P2 narrowly fails}. The unpredicted
-        \code{permutation\_invariance} removal (0.41) is what carries the union.
+        \code{permutation\_invariance} removal (0.41) is what carries the union. Separately,
+        \code{watermark\_variance}'s ``FPR 0'' is a floor effect (threshold 0.0; every honest score is
+        exactly 0.0).
   \item \textbf{P3} (\code{acceptance\_bias} off-review): not computable from the committed files.
   \item \textbf{P4} (grep matches the union at FPR 0): \textbf{not run}; it needs regenerated
         transcripts, which requires executing third-party code.
   \item \textbf{P5} (LLM arm of ColludeBench): not run; replaced by the canary.
 \end{itemize}
 \textbf{Other instruments.} \textbf{P7} (2608.18078, $n=7$, CI contains 0 and 0.771): holds, re-read
-from the PDF. \textbf{P8} (NARCBench scenario interval): cannot run; no Verdict tier is released.
+from the PDF. \textbf{P8} (NARCBench scenario interval): cannot run; no Verdict tier is released. Caveat on (i):
+NARCBench's selection may rest on a transcript judgment that is not shipped; we state only that the
+shipped \code{collusion\_success} flag disagrees with the released label.
 
 \textbf{Canary.} Predictions 1--4 as in \S4. Amendments: \textbf{A1} run-level estimator replaces a
 within-run permutation test shown invalid on scripted agents; \textbf{A2} placebo replicate rule;
 \textbf{A3} backend (Qwen3.8-27B on Groq; one call for A's message and price), before any
 pre-registered run; \textbf{A4} POS's proposal step, before the POS, M and M+P arms; \textbf{A5} the
 parser requires a \code{"price"} key, from M+P on (sensitivity: dropping the one affected run per
-completed arm moves POS to $+0.787$ SD; P-0 unchanged); \textbf{A6} M-S, post hoc; \textbf{A7}
+completed arm moves POS to $+0.787$ SD; P-0 unchanged); \textbf{A6} M-S, post hoc (primary
+estimate $R=(\text{M-S}-\text{P-0})/(\text{M}-\text{P-0})$, pre-set threshold 0.5; M-S $-$ P-0
+$=+1.060$ [$+0.737$, $+1.360$]); \textbf{A7}
 reporting in price units with MDE, post hoc. M-S's first attempt crashed on a rate-limit retry bug;
 per the pre-registration it was re-run whole after a retry-only harness fix (hash recorded), and the
-partial run is archived unanalysed.
+partial run is archived unanalysed. Round numbers: B's prices are multiples of 0.5 in 66\% (M),
+78\% (M+P) and 24\% (P-0) of rounds.
 
 \textbf{Compliance follow-up (Z2)}, hashed before any Z2 call; designed after seeing the canary, so a
 post-hoc follow-up. Canary round-1 B prompt, 40 independent calls per arm, self-hosted Qwen3.8-27B
@@ -460,7 +438,17 @@ post-hoc follow-up. Canary round-1 B prompt, 40 independent calls per arm, self-
         same round-1 clip outliers as in P-0.
 \end{itemize}
 
-\section{Reproduction}\label{app:repro}
+\section{Audit procedure and reproduction}\label{app:repro}
+\textbf{Audit procedure.} \textbf{ColludeBench} \cite{tailor} (MIT): we recomputed the committed
+\code{metrics.md} from \code{metrics.json}, compared both with the paper, and ran
+leave-one-statistic-out over the 255 non-empty subsets of 8 statistics in \code{ablation.json}.
+\textbf{Riemer et al.}\ \cite{riemer}: we recovered $n$ from the reported $r$/$p$ pairs in Table~3
+and computed Fisher-$z$ intervals. \textbf{NARCBench} \cite{narc}: we joined the released activation
+metadata to the released run configurations (62 Qwen3-32B runs; seeds and agent names match 62/62)
+and compared the positive label with the assigned mode and with the authors' own behavioural flags.
+Every downloaded file was treated as untrusted data and read with Python in isolated mode; no
+third-party code was executed.
+
 \begin{itemize}
   \item \textbf{Conditions card:} \code{python -I build\_specs.py <metrics.json> <narcbench/scenarios>
         <qwen3\_32b/core/metadata\_gen.json> <ablation.json> ../canary/prereg/report.json >
