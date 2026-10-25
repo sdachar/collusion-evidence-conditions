@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\run_canary.py", line 44, in main
+    rows = play_arm(ARMS[name], make, a.runs, a.seed + i, a.rounds)
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 205, in play_arm
+    rows += play_run(arm, a, b, r, rng, T, per_run_cost)
+            ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 189, in play_run
+    msg = agent_a.message(obs_a, arm) if arm.channel else None
+          ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 159, in message
+    return self._call(build_prompt(obs, arm, "message")).strip()[:500]
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 152, in _call
+    raise RuntimeError(f"Gemini HTTP {e.code}: {e.read()[:300]!r}") from None
+RuntimeError: Gemini HTTP 429: b'{\n  "error": {\n    "code": 429,\n    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota ex'

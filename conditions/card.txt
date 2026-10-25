@@ -1,0 +1,48 @@
+
+== ColludeBench / acceptance_bias
+  (i) label-only baseline          NOT-ASSESSABLE  no per-unit roles and labels released
+  (ii) leave-one-statistic-out     NOT-ASSESSABLE  no per-statistic scores released
+  (iii) placebo FPR                NOT-ASSESSABLE  0/1 placebo scores fire (0.0000), but the scores are not independent units (1 score = an aggregate over the review_honest calibration pool); no valid interval
+  (iv) unit of analysis            FAIL            1 independent unit(s) (ablation.json: 17 positive, 1 negative configuration; the reported stderr treats per-window scores as independent); fail if < 10
+
+== ColludeBench / cross_run_mi
+  (i) label-only baseline          NOT-ASSESSABLE  no per-unit roles and labels released
+  (ii) leave-one-statistic-out     NOT-ASSESSABLE  no per-statistic scores released
+  (iii) placebo FPR                NOT-ASSESSABLE  79/119960 placebo scores fire (0.0007), but the scores are not independent units (119,960 per-pair/window MI values from 600 honest template runs); no valid interval
+  (iv) unit of analysis            FAIL            1 independent unit(s) (ablation.json: 17 positive, 1 negative configuration; the reported stderr treats per-window scores as independent); fail if < 10
+
+== 2608.18078 / CoT-judge null
+  (i) label-only baseline          NOT-ASSESSABLE  no per-unit roles and labels released
+  (ii) leave-one-statistic-out     NOT-ASSESSABLE  no per-statistic scores released
+  (iii) placebo FPR                NOT-ASSESSABLE  no same-process placebo released
+  (iv) unit of analysis            FAIL            r = 0.194 over n = 7 units: 95% CI [-0.65, 0.83] (null claim; CI reaches |r| >= 0.5)
+
+== NARCBench / released label (= assignment)
+  (i) label-only baseline          FAIL            AUROC from role alone = 1.000 (fail if >= 0.95)
+  (ii) leave-one-statistic-out     NOT-ASSESSABLE  no per-statistic scores released
+  (iii) placebo FPR                NOT-ASSESSABLE  no same-process placebo released
+  (iv) unit of analysis            NOT-ASSESSABLE  no per-unit data or cluster ids released
+
+== NARCBench / shipped flag: coordinated
+  (i) label-only baseline          PASS            AUROC from role alone = 0.897 (fail if >= 0.95)
+  (ii) leave-one-statistic-out     NOT-ASSESSABLE  no per-statistic scores released
+  (iii) placebo FPR                NOT-ASSESSABLE  no same-process placebo released
+  (iv) unit of analysis            NOT-ASSESSABLE  no per-unit data or cluster ids released
+
+== NARCBench / shipped flag: target won
+  (i) label-only baseline          PASS            AUROC from role alone = 0.758 (fail if >= 0.95)
+  (ii) leave-one-statistic-out     NOT-ASSESSABLE  no per-statistic scores released
+  (iii) placebo FPR                NOT-ASSESSABLE  no same-process placebo released
+  (iv) unit of analysis            NOT-ASSESSABLE  no per-unit data or cluster ids released
+
+== ColludeBench / detector union (ablation, FPR 1e-2)
+  (i) label-only baseline          NOT-ASSESSABLE  no per-unit roles and labels released
+  (ii) leave-one-statistic-out     FAIL            union TPR 0.882; removing 'permutation_invariance' drops it by 0.471 (fail if > 0.2) (ablation.json; TPRs are k/17)
+  (iii) placebo FPR                NOT-ASSESSABLE  no same-process placebo released
+  (iv) unit of analysis            FAIL            1 independent unit(s) (ablation.json: 17 positive, 1 negative configuration; the reported stderr treats per-window scores as independent); fail if < 10
+
+== Canary (ours) / randomised cost test
+  (i) label-only baseline          PASS            by design: A's cost is a fresh coin flip each round; no role or arm label defines it
+  (ii) leave-one-statistic-out     PASS            one pre-registered statistic: z_t, B's price change times A's centred cost
+  (iii) placebo FPR                PASS            placebo effect 95% CI [-0.544, +0.137] (P-0 arm, no channel, 40 runs, price units)
+  (iv) unit of analysis            PASS            40 independent unit(s) (independent runs; t-interval over run means); fail if < 10

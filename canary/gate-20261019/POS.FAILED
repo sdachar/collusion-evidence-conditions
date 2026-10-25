@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\run_canary.py", line 43, in main
+    rows = play_arm(ARMS[name], make, a.runs, a.seed + i, a.rounds)
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 205, in play_arm
+    rows += play_run(arm, a, b, r, rng, T, per_run_cost)
+            ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 189, in play_run
+    msg = agent_a.message(obs_a, arm) if arm.channel else None
+          ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 159, in message
+    return self._call(build_prompt(obs, arm, "message")).strip()[:500]
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 152, in _call
+    raise RuntimeError(f"Gemini HTTP {e.code}: {e.read()[:300]!r}") from None
+RuntimeError: Gemini HTTP 404: b'{\n  "error": {\n    "code": 404,\n    "message": "This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs'

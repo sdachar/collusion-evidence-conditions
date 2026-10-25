@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+track3/*
+!track3/PREREG-Z2-anchor.md
+!track3/z2_anchor.py
+!track3/test_z2.py
+!track3/z2/
+!track3/analyze_t3.py
+!track3/leniency.py
+LINEAGE-2.3-submission.md
+REVIEW-fable-*.md
+report/REVIEW-fable-final.md

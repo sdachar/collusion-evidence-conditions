@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\run_canary.py", line 46, in main
+    rows = play_arm(ARMS[name], make, a.runs, a.seed + i, a.rounds)
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 311, in play_arm
+    rows += play_run(arm, a, b, r, rng, T, per_run_cost)
+            ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 298, in play_run
+    p_b = float(np.clip(agent_b.price(obs_b, arm), P_MIN, P_MAX))
+                        ~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 155, in price
+    return self._parsed(build_prompt(obs, arm, "price"), parse_price)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 147, in _parsed
+    text = self._call(prompt)
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 225, in _call
+    raise RuntimeError(f"Groq 429 with retry-after {retry:.0f}s (daily cap?)") from None
+RuntimeError: Groq 429 with retry-after 198s (daily cap?)

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\run_canary.py", line 88, in main
+    rows = play_arm(ARMS[name], make, a.runs, a.seed + i, a.rounds, scramble_source=source)
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 355, in play_arm
+    rows += play_run(arm, a, b, r, rng, T, per_run_cost, plan[r] if plan else None)
+            ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 319, in play_run
+    msg, p_a = agent_a.act(obs_a, arm)       # LLM: one call (A3)
+               ~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 166, in act
+    return self._parsed(build_prompt(obs, arm, "act"), parse_act)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 151, in _parsed
+    text = self._call(prompt)
+  File "C:\Users\shubha.achar\personal\ai-collusion\sprint\canary\harness.py", line 233, in _call
+    raise RuntimeError(f"Groq HTTP {e.code}: {err!r}") from None
+RuntimeError: Groq HTTP 429: b'{"error":{"message":"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m5ap3vxsezxrvfatxb2ez3mc` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199540, Requested 561. Please try again in 43.632s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}\n'
