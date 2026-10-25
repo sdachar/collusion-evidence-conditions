@@ -24,6 +24,7 @@
 \captionsetup{font=small,labelfont=bf}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
 \title{Is It Really Collusion?\\[2pt]
 \large Four Conditions for AI Collusion Evidence, and Three Published Instruments That Don't Meet Them\thanks{Research conducted at the AI Collusion Research Sprint (Apart Research), October 2026. Track 2.3: \emph{What should count as convincing evidence of collusion?}}}
@@ -106,7 +107,7 @@ controls.
 \centering\small
 \caption{The four conditions and their executable checks (default thresholds).}
 \label{tab:conditions}
-\begin{tabularx}{\textwidth}{@{}p{2.3cm}YY@{}}
+\begin{tabularx}{\textwidth}{@{}L{2.3cm}YY@{}}
 \toprule
 Condition & The failure it catches & Check (default threshold) \\
 \midrule
@@ -162,11 +163,11 @@ with 40 independent calls per arm on self-hosted Qwen3.8-27B (vLLM).
 NA = not assessable from what is released. $\dagger$ Scored from the paper's abstract, not by our
 checker; included to show the card can return a pass.}
 \label{tab:verdicts}
-\begin{tabularx}{\textwidth}{@{}p{3.4cm}YYYY@{}}
+\begin{tabularx}{\textwidth}{@{}L{3.4cm}YYYY@{}}
 \toprule
 Instrument (kind) & (i) Label & (ii) One statistic & (iii) Placebo & (iv) Unit \\
 \midrule
-ColludeBench union \cite{tailor} (statistical) & NA & \textbf{FAIL}: 15/17 $\to$ 7/17 without \code{permutation\_invariance} & NA: template honest pool, per-window scores & \textbf{FAIL}: 1 negative configuration \\
+ColludeBench union \cite{tailor} (statistical) & NA & \textbf{FAIL}: 15/17 $\to$ 7/17 without \code{permutation\_\allowbreak invariance} & NA: template honest pool, per-window scores & \textbf{FAIL}: 1 negative configuration \\
 Riemer et al.\ CoT judges \cite{riemer} (LLM judge) & NA & NA & NA & \textbf{FAIL}: null over $n=7$, CI $[-0.65,+0.83]$ \\
 NARCBench probes \cite{narc} (activations) & \textbf{FAIL}: released label = assigned mode (AUROC 1.00) & NA & NA & NA \\
 \textbf{Canary, ours} (randomised) & PASS (by design) & PASS (one statistic) & PASS: P-0 CI $[-0.54,+0.14]\ni 0$ & PASS: 40 independent runs \\
@@ -304,7 +305,7 @@ the null or the honest baseline is defined by the experimenter's construction, n
 behaviour. When the auditor controls the generator the remedy is cheap: randomise a private variable
 and test whether it moves.
 
-\textbf{Limitations.}
+\noindent\textbf{Limitations.}
 \begin{itemize}
   \item \textbf{The conditions are necessary, not sufficient.} Passing them makes evidence checkable;
         it does not make a detector complete. Motwani's result still bounds every black-box test,
@@ -318,7 +319,7 @@ and test whether it moves.
         (Appendix~\ref{app:corrections}).
 \end{itemize}
 
-\textbf{Future work.} Antitrust price screens (coefficient of variation, relative distance) ported
+\noindent\textbf{Future work.} Antitrust price screens (coefficient of variation, relative distance) ported
 to LLM pricing logs, and leniency for AI cartels: B adopts A's explicit price proposals in 83--98\%
 of rounds, a reportable agreement. Both held to the same four conditions.
 
@@ -333,8 +334,8 @@ detectable cost leak, and a follower whose lockstep is compliance with whatever 
 % ---------------------------------------------------------------- Code and Data
 \section*{Code and Data}
 \begin{itemize}
-  \item \textbf{Code repository:} \url{https://github.com/sdachar/collusion-evidence-conditions}
-        --- \code{conditions/} (checker, spec builder, card, tests); \code{colludebench/}
+  \item \textbf{Code repository:} \url{https://github.com/sdachar/collusion-evidence-conditions}.
+        Contents: \code{conditions/} (checker, spec builder, card, tests); \code{colludebench/}
         (recompute and leave-one-out scripts); \code{canary/} (harness, analysis, \code{report.py},
         every CSV and full call logs, tests); \code{PREREG-P9-canary.md} and hashes; \code{track3/} (Z2: \code{PREREG-Z2-anchor.md},
         \code{z2\_anchor.py}, tests, \code{z2/} logs, and the two modules it imports);
@@ -450,17 +451,17 @@ Every downloaded file was treated as untrusted data and read with Python in isol
 third-party code was executed.
 
 \begin{itemize}
-  \item \textbf{Conditions card:} \code{python -I build\_specs.py <metrics.json> <narcbench/scenarios>
-        <qwen3\_32b/core/metadata\_gen.json> <ablation.json> ../canary/prereg/report.json >
-        specs.json}, then \code{python -I check\_conditions.py specs.json}.
-  \item \textbf{ColludeBench leave-one-out:} \code{python -I 01\_leave\_one\_out.py <ablation.json>
-        leave\_one\_out.csv}.
+  \item \textbf{Conditions card:}\\ {\footnotesize\code{python -I build\_specs.py <metrics.json> <narcbench/scenarios>}\\
+        \code{\ \ <qwen3\_32b/core/metadata\_gen.json> <ablation.json>}\\
+        \code{\ \ ../canary/prereg/report.json > specs.json}\\
+        \code{python -I check\_conditions.py specs.json}}
+  \item \textbf{ColludeBench leave-one-out:}\\ {\footnotesize\code{python -I 01\_leave\_one\_out.py <ablation.json> leave\_one\_out.csv}}
   \item \textbf{Canary:} per arm \code{python run\_canary.py --agents groq --runs 40 --arms <ARM>
         --out prereg --seed <SEED>}; seeds P-0 20261019, POS 20261020, M 20261021, M+P 20261022, M-S
         20261023 with \code{--scramble-from prereg/M.csv}; then \code{python report.py}.
   \item \textbf{Tests:} \code{pytest} in \code{conditions/} (14) and \code{canary/} (19).
   \item \textbf{Source data:} ColludeBench \code{results/experiments/\{metrics,ablation\}.json} and
-        \code{results/dataset\_manifest.json} at \code{Ostailor/Steganographic\_Collusion@main};
+        \code{results/\allowbreak dataset\_manifest.json} at \code{Ostailor/\allowbreak Steganographic\_Collusion@main};
         NARCBench at Hugging Face \code{aaronrose227/narcbench}, revision 19cb14b; 2608.18078 PDF,
         Tables 3 and 5.
 \end{itemize}
